@@ -1,0 +1,61 @@
+##############################
+# FICHIERS TEMPORAIRES ET BUILD
+##############################
+
+# Maven
+target/
+**/target/
+.mvn/wrapper/maven-wrapper.jar
+
+# Node / Vue / Nuxt
+node_modules/
+**/node_modules/
+.nuxt/
+.output/
+
+##############################
+# FICHIERS DE CONFIGURATION ET DE LOGS
+##############################
+
+HELP.md
+*.log
+*.iml
+
+##############################
+# OUTILS ET IDE
+##############################
+
+# Spring Tool Suite (STS)
+.apt_generated/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+
+##############################
+# SYSTÈME ET AUTRES
+##############################
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db

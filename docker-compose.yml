@@ -1,0 +1,55 @@
+volumes:
+  acc_pg_data:
+
+services:
+  backend:
+    container_name: acc-backend
+    environment:
+      ENVIRONMENT: DEVELOPMENT
+      CORS_ORIGINS: http://localhost:3000
+      PG_DSN: postgresql://acc:acc@postgres:5432/acc
+      JWT_SECRET: abd84ebeb6581c26b53fa30d89c4e7fbc48ee5b4f3b8ddedb7586cfeb3daca0c
+      ADMIN_EMAIL: admin@example.com
+      ADMIN_PASSWORD: adminadmin
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: acc-backend:latest
+    ports:
+      - 8400:8400
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend/static:/app/static/
+    restart: unless-stopped
+
+  frontend:
+    container_name: acc-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: acc-frontend:latest
+    environment:
+      API_PROXY_TARGET: backend
+      API_PROXY_PORT: 8400
+      PORT: 8080
+      VITE_MODE_ENV: production
+      NUXT_PUBLIC_BACKEND: 1
+    ports:
+      - 8080:8080
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  postgres:
+    container_name: acc-postgres
+    environment:
+      POSTGRES_DB: acc
+      POSTGRES_PASSWORD: acc
+      POSTGRES_USER: acc
+    image: postgres:18
+    ports:
+      - 5432:5432
+    restart: always
+    volumes:
+      - acc_pg_data:/var/lib/postgresql/18/data
