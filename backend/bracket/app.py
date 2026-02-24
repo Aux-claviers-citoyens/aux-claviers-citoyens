@@ -62,6 +62,8 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     await AsyncioTasksManager.gather()
 
 
+API_PREFIX = "/api/v1"
+
 routers = {
     "Auth": auth.router,
     "Clubs": clubs.router,
@@ -155,4 +157,4 @@ async def generic_exception_handler(request: Request, exc: Exception) -> JSONRes
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 for tag, router in routers.items():
-    app.include_router(router, tags=[tag])
+    app.include_router(router, tags=[tag], prefix=API_PREFIX)

@@ -63,7 +63,7 @@
       <img
         :src="
           tournament?.logo_path
-            ? `/api/static/tournament-logos/${tournament?.logo_path}`
+            ? `/static/tournament-logos/${tournament?.logo_path}`
             : `/bg-tournois-default.jpg`
         "
         alt="Tournois"

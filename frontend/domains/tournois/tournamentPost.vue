@@ -20,7 +20,7 @@
 <template>
   <UBlogPost
     :title="tournament.name"
-    :image="`/api/static/tournament-logos/${tournament.logo_path}`"
+    :image="`/static/tournament-logos/${tournament.logo_path}`"
   >
     <template #description>
       <div class="flex content-start pt-2.5">

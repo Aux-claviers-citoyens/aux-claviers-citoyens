@@ -29,7 +29,9 @@
     <h2 class="text-5xl text-center font-bold mb-12">
       Leaderboard des équipes
     </h2>
-    <div class="w-full space-y-4 pb-4 border border-accented rounded-lg">
+    <div
+      class="w-full space-y-4 pb-4 border border-accented rounded-lg bg-black"
+    >
       <div class="flex px-4 py-3.5 border-b border-accented">
         <UInput
           v-model="globalFilter"

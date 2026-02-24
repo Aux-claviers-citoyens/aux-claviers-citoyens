@@ -32,7 +32,7 @@
       cell: ({ row }) => {
         return row.original.logo_path !== null
           ? h(UAvatar, {
-              src: `/api/static/team-logos/${row.original.logo_path}`,
+              src: `/static/team-logos/${row.original.logo_path}`,
               class: 'w-[60px] h-[60px]',
             })
           : h(UIcon, {
@@ -74,7 +74,7 @@
   <UTable
     :data="filtered"
     :columns="columns"
-    class="flex-1 bg-black"
+    class="flex-1"
     v-model:pagination="pagination"
     :pagination-options="{
       getPaginationRowModel: getPaginationRowModel(),
