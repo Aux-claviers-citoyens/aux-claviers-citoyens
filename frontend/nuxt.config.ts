@@ -14,7 +14,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     backendBaseUrl: 'http://localhost:8400',
     public: {
-      apiBaseUrl: '/api',
+      apiBaseUrl: '/api/v1',
       backend: process.env.NUXT_PUBLIC_BACKEND || false,
     },
   },

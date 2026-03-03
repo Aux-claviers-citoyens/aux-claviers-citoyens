@@ -1,0 +1,28 @@
+@scheme = http://
+@host = localhost
+@port = 8400
+@prefix = /api/v1
+@baseUrl = {{scheme}}{{host}}:{{port}}{{prefix}}
+@endpoint = tournaments
+
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiYWRtaW5AZXhhbXBsZS5jb20iLCJleHAiOjE3NzI1NDI4MTF9.5mAwd-hh7NOBpR8OomxL9BllaUPIsImvhwPGdtoVrYU
+
+@tournamentId = 1
+@stageId = 1
+
+### GetAll
+GET {{baseUrl}}/{{endpoint}}/{{tournamentId}}/stages
+Content-Type: application/json
+accept: application/json
+authorization: Bearer {{token}}
+
+### Create // Put
+POST {{baseUrl}}/{{endpoint}}/{{tournamentId}}/stages
+Content-Type: application/json
+accept: application/json
+authorization: Bearer {{token}}
+###
+DELETE {{baseUrl}}/{{endpoint}}/{{tournamentId}}/stages/{{stageId}}
+Content-Type: application/json
+accept: application/json
+authorization: Bearer {{token}}

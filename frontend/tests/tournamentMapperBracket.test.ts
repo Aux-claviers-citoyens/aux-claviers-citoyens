@@ -38,7 +38,7 @@ describe('tournamentToDomain', () => {
     const tournament = {
       id: 12,
       name: 'Summer Cup',
-      logo_path: logoPath,
+      logo_path: `/static/tournament-logos/${logoPath}`,
       dashboard_endpoint: 'lol_Summer Cup_aae',
       status: 'OPEN',
     }
@@ -50,7 +50,7 @@ describe('tournamentToDomain', () => {
     expect(tournamentToDomain(tournament as never)).toEqual({
       id: 12,
       name: 'Summer Cup',
-      logo_path: logoPath,
+      logo_path: `/static/tournament-logos/${logoPath}`,
       game: 'lol',
       status: 'En cours',
     })
@@ -64,7 +64,7 @@ describe('tournamentToDomainWithStage', () => {
       id: 1,
       name: 'Autumn Cup',
       game: 'rl',
-      logo_path: logoPath,
+      logo_path: `/static/tournament-logos/${logoPath}`,
       status: 'En cours',
     }
 
@@ -143,8 +143,18 @@ describe('tournamentToDomainWithStage', () => {
     })
     expect(result.teams).toEqual(
       expect.arrayContaining([
-        { id: 2, name: 'Alpha', elo_score: 1300, logo_path: logoPath },
-        { id: 3, name: 'Beta', elo_score: 1100, logo_path: logoPath },
+        {
+          id: 2,
+          name: 'Alpha',
+          elo_score: 1300,
+          logo_path: `/static/team-logos/${logoPath}`,
+        },
+        {
+          id: 3,
+          name: 'Beta',
+          elo_score: 1100,
+          logo_path: `/static/team-logos/${logoPath}`,
+        },
       ]),
     )
     expect(result.rounds).toMatchObject([

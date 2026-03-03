@@ -1,0 +1,54 @@
+@scheme = http://
+@host = localhost
+@port = 8400
+@prefix = /api/v1
+@baseUrl = {{scheme}}{{host}}:{{port}}{{prefix}}
+@endpoint = tournaments
+
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiYWRtaW5AZXhhbXBsZS5jb20iLCJleHAiOjE3NzI1NDI4MTF9.5mAwd-hh7NOBpR8OomxL9BllaUPIsImvhwPGdtoVrYU
+
+@id = 1
+
+### GetAllTournaments
+GET {{baseUrl}}/{{endpoint}}
+Content-Type: application/json
+accept: application/json
+authorization: Bearer {{token}}
+
+### GetById
+GET {{baseUrl}}/{{endpoint}}/{{id}}
+Content-Type: application/json
+accept: application/json
+authorization: Bearer {{token}}
+
+### Create // Put
+POST {{baseUrl}}/{{endpoint}}
+Content-Type: application/json
+accept: application/json
+authorization: Bearer {{token}}
+
+{
+  "start_time": "2025-12-01T08:31:11.398Z",
+  "name": "lol6",
+  "dashboard_public": true,
+  "dashboard_endpoint": "lol6",
+  "players_can_be_in_multiple_teams": true,
+  "auto_assign_courts": true,
+  "duration_minutes": 1,
+  "margin_minutes": 0
+}
+###
+DELETE {{baseUrl}}/{{endpoint}}/{{id}}
+Content-Type: application/json
+accept: application/json
+authorization: Bearer {{token}}
+
+### Change status
+POST {{baseUrl}}/{{endpoint}}/{{id}}/change-status
+Content-Type: application/json
+accept: application/json
+authorization: Bearer {{token}}
+
+{
+  "status": "OPEN"
+}

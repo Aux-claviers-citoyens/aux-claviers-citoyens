@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import type { Team } from '~/types/front/Team'
-  import * as z from 'zod'
+  import * as zod from 'zod'
   import TeamModalFields from '~/domains/tournois/id/teams/TeamModalFields.vue'
   import { filterTeam } from '~/methods/filterTeam'
   import { getMessageError } from '~/methods/getMessageError'
@@ -20,6 +20,7 @@
   const form = defineModel<HTMLFormElement>('form')
   const isLoading = defineModel<boolean>('isLoading')
   const isValid = defineModel<boolean>('isValid')
+  const isOpenModal = defineModel<boolean>('isOpenModal')
   const team = defineModel<Team>('team', {
     default: { name: '' },
   })
@@ -33,12 +34,12 @@
   const emptyTeamSelectionValue = ' '
   const teamNameSelected = ref(emptyTeamSelectionValue)
 
-  const schema = z
+  const schema = zod
     .object({
-      team: z.object({
-        name: z.string(),
+      team: zod.object({
+        name: zod.string().trim(),
       }),
-      teamSelected: z.string().nullable(),
+      teamSelected: zod.string().nullable(),
     })
     .superRefine((data, ctx) => {
       if (data.teamSelected && data.teamSelected !== emptyTeamSelectionValue) {
@@ -46,7 +47,7 @@
       }
       if (!data.team.name) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: zod.ZodIssueCode.custom,
           message: 'Nom obligatoire',
           path: ['name'],
         })
@@ -54,7 +55,7 @@
       }
       if (data.team.name.length < 2) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: zod.ZodIssueCode.custom,
           message: 'Nom trop petit (min 2)',
           path: ['name'],
         })
@@ -62,7 +63,7 @@
       }
       if (data.team.name.length > 30) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: zod.ZodIssueCode.custom,
           message: 'Nom trop grand (max 30)',
           path: ['name'],
         })
@@ -71,8 +72,9 @@
 
   const onSubmit = async () => {
     isLoading.value = true
+    team.value.name = team.value.name.trim().replace(/\s+/g, ' ')
     if (
-      !filterTeams.value.includes(team.value.name.toUpperCase().trim()) ||
+      !filterTeams.value.includes(team.value.name.toUpperCase()) ||
       isTeamSelected.value
     ) {
       try {
@@ -86,16 +88,18 @@
             teamNameSelected.value = emptyTeamSelectionValue
           }
         } else {
-          !team.value.id
-            ? await backend.postTeam(team.value, tournamentId)
-            : await backend.putTeam(team.value, tournamentId)
+          if (!team.value.id) {
+            await backend.postTeam(team.value, tournamentId)
+            team.value.name = ''
+            team.value.image = undefined
+          } else {
+            await backend.putTeam(team.value, tournamentId)
+            isOpenModal.value = false
+          }
           toastSuccess(
             `Succès, équipe ${team.value.id ? `${team.value.name} modifiée` : `${team.value.name} créée`}`,
           )
         }
-        team.value.name = ''
-        team.value.image = undefined
-        refresh(tournamentId)
       } catch (err: unknown) {
         toastError(
           getMessageError(err, "Erreur lors de la création de l'équipe."),
@@ -110,7 +114,7 @@
   }
 
   onMounted(async () => {
-    allTeam.value = await backend.getAllTeams()
+    allTeam.value = await backend.getAllTeamsFiltered()
   })
 
   const teamsNotRegistered = computed<Team[]>(() =>

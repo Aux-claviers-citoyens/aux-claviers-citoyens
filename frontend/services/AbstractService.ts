@@ -22,7 +22,7 @@ export default abstract class AbstractService {
     status: Status,
   ): Promise<void>
 
-  abstract getAllTeams(): Promise<Team[]>
+  abstract getAllTeamsFiltered(): Promise<Team[]>
 
   abstract getAllTeam(tournamentId: number): Promise<Team[]>
 

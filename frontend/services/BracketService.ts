@@ -27,12 +27,13 @@ import { ApiError } from '~/types/exceptions/ApiError'
 import type { Match } from '~/types/front/Match'
 import { MatchToDTO } from '~/mappers/bracket/MatchMapperBracket'
 import { getMessageError } from '~/methods/getMessageError'
+import { cleanTeamName } from '~/methods/filterTeam'
 
 export default class BracketService extends AbstractService {
   //region Tournament APIs
 
   override getAllTournaments = (): Promise<Tournament[]> =>
-    $fetch<ApiResponse<TournamentBracket[]>>('/api/tournaments', {
+    $fetch<ApiResponse<TournamentBracket[]>>('/api/v1/tournaments', {
       method: 'GET',
     })
       .then((tournaments): Tournament[] =>
@@ -61,9 +62,12 @@ export default class BracketService extends AbstractService {
       )
     })
   getTournamentById = (tournamentId: number): Promise<Tournament> =>
-    $fetch<ApiResponse<TournamentBracket>>(`/api/tournaments/${tournamentId}`, {
-      method: 'GET',
-    })
+    $fetch<ApiResponse<TournamentBracket>>(
+      `/api/v1/tournaments/${tournamentId}`,
+      {
+        method: 'GET',
+      },
+    )
       .then((tournament): Tournament => tournamentToDomain(tournament.data))
       .catch((error: unknown) => {
         throw new ApiError(
@@ -73,12 +77,12 @@ export default class BracketService extends AbstractService {
   override getTournamentByIdWithMatches = (
     tournamentId: number,
   ): Promise<Tournament> =>
-    this.getTournamentById(tournamentId)
-      .then(async (tournament: Tournament) =>
-        tournamentToDomainWithStage(
-          tournament,
-          await this.getAllStage(tournament.id!),
-        ),
+    Promise.all([
+      this.getTournamentById(tournamentId),
+      this.getAllStage(tournamentId),
+    ])
+      .then(([tournament, stages]) =>
+        tournamentToDomainWithStage(tournament, stages),
       )
       .catch((error: unknown) => {
         throw new ApiError(
@@ -92,7 +96,7 @@ export default class BracketService extends AbstractService {
     image,
     ...tournament
   }: Tournament): Promise<Tournament> =>
-    $fetch<ApiResponse<TournamentBracket>>(`/api/tournaments`, {
+    $fetch<ApiResponse<TournamentBracket>>(`/api/v1/tournaments`, {
       method: 'POST',
       body: tournamentBracketToDTO(tournament),
     })
@@ -180,7 +184,7 @@ export default class BracketService extends AbstractService {
       })
       //suppress tournament
       .then(() =>
-        $fetch<void>(`/api/tournaments/${tournamentId}`, {
+        $fetch<void>(`/api/v1/tournaments/${tournamentId}`, {
           method: 'DELETE',
         }),
       )
@@ -195,7 +199,7 @@ export default class BracketService extends AbstractService {
     tournamentId: number,
   ): Promise<Tournament> =>
     $fetch<ApiResponse<TournamentBracket>>(
-      `/api/tournaments/${tournamentId}/logo`,
+      `/api/v1/tournaments/${tournamentId}/logo`,
       {
         method: 'POST',
         body: this.formImage(image),
@@ -217,7 +221,7 @@ export default class BracketService extends AbstractService {
       })
 
   getAllCourt = (tournamentId: number): Promise<Court[]> =>
-    $fetch<ApiResponse<Court[]>>(`/api/tournaments/${tournamentId}/courts`, {
+    $fetch<ApiResponse<Court[]>>(`/api/v1/tournaments/${tournamentId}/courts`, {
       method: 'GET',
     })
       .then((response) => response.data)
@@ -228,7 +232,7 @@ export default class BracketService extends AbstractService {
       })
 
   postCourt = (tournamentId: number): Promise<Court> =>
-    $fetch<ApiResponse<Court>>(`/api/tournaments/${tournamentId}/courts`, {
+    $fetch<ApiResponse<Court>>(`/api/v1/tournaments/${tournamentId}/courts`, {
       method: 'POST',
       body: {
         name: 'Default court',
@@ -242,7 +246,7 @@ export default class BracketService extends AbstractService {
       })
 
   deleteCourt = (tournamentId: number, courtId: number): Promise<void> =>
-    $fetch<void>(`/api/tournaments/${tournamentId}/courts/${courtId}`, {
+    $fetch<void>(`/api/v1/tournaments/${tournamentId}/courts/${courtId}`, {
       method: 'DELETE',
     }).catch((error: unknown) => {
       throw new ApiError(
@@ -251,7 +255,7 @@ export default class BracketService extends AbstractService {
     })
 
   postSchedule = (tournamentId: number): Promise<void> =>
-    $fetch<void>(`/api/tournaments/${tournamentId}/schedule_matches`, {
+    $fetch<void>(`/api/v1/tournaments/${tournamentId}/schedule_matches`, {
       method: 'POST',
     }).catch((error: unknown) => {
       throw new ApiError(
@@ -268,7 +272,7 @@ export default class BracketService extends AbstractService {
 
   getAllStage = (tournamentId: number): Promise<StageWithStageItems[]> =>
     $fetch<ApiResponse<StageWithStageItems[]>>(
-      `/api/tournaments/${tournamentId}/stages`,
+      `/api/v1/tournaments/${tournamentId}/stages`,
       {
         method: 'GET',
       },
@@ -281,7 +285,7 @@ export default class BracketService extends AbstractService {
       })
   postStage = (tournament: Tournament): Promise<Tournament> =>
     $fetch<ApiResponse<StageWithStageItems>>(
-      `/api/tournaments/${tournament.id}/stages`,
+      `/api/v1/tournaments/${tournament.id}/stages`,
       {
         method: 'POST',
       },
@@ -309,7 +313,7 @@ export default class BracketService extends AbstractService {
     stageId: number,
     courtId: number,
   ): Promise<void> =>
-    $fetch<void>(`/api/tournaments/${tournament.id}/stage_items`, {
+    $fetch<void>(`/api/v1/tournaments/${tournament.id}/stage_items`, {
       method: 'POST',
       body: <StageItemPost>{
         stage_id: stageId,
@@ -328,7 +332,7 @@ export default class BracketService extends AbstractService {
     })
 
   deleteStage = (tournamentId: number, stageId: number): Promise<void> =>
-    $fetch<void>(`/api/tournaments/${tournamentId}/stages/${stageId}`, {
+    $fetch<void>(`/api/v1/tournaments/${tournamentId}/stages/${stageId}`, {
       method: 'DELETE',
     }).catch((error: unknown) => {
       throw new ApiError(
@@ -344,7 +348,7 @@ export default class BracketService extends AbstractService {
     stageItemId: number,
   ): Promise<void> =>
     $fetch<void>(
-      `/api/tournaments/${tournamentId}/stage_items/${stageItemId}`,
+      `/api/v1/tournaments/${tournamentId}/stage_items/${stageItemId}`,
       {
         method: 'DELETE',
       },
@@ -361,7 +365,7 @@ export default class BracketService extends AbstractService {
 
   //region teams
 
-  override getAllTeams = (): Promise<Team[]> =>
+  getAllTeams = (): Promise<Team[]> =>
     this.getAllTournaments()
       .then((tournaments) =>
         Promise.all(
@@ -369,19 +373,21 @@ export default class BracketService extends AbstractService {
         ),
       )
       .then((teams) => teams.flat())
-      .then((teams) =>
-        Array.from(new Map(teams.map((team) => [team.name, team])).values()),
-      )
+
+  override getAllTeamsFiltered = (): Promise<Team[]> =>
+    this.getAllTeams().then((teams) =>
+      Array.from(new Map(teams.map((team) => [team.name, team])).values()),
+    )
 
   override getAllTeam = (tournamentId: number): Promise<Team[]> =>
     $fetch<ApiResponse<TeamsWithPlayersResponse>>(
-      `/api/tournaments/${tournamentId}/teams`,
+      `/api/v1/tournaments/${tournamentId}/teams`,
       {
         method: 'GET',
       },
     )
       .then((teams) =>
-        teams.data.teams.map((team) => teamBracketToDomain(team)),
+        teams.data.teams.map((team) => teamBracketToDomain(team, tournamentId)),
       )
       .catch((error: unknown) => {
         throw new ApiError(
@@ -393,11 +399,14 @@ export default class BracketService extends AbstractService {
     { image, ...team }: Team,
     tournamentId: number,
   ): Promise<Team> =>
-    $fetch<ApiResponse<TeamBracket>>(`/api/tournaments/${tournamentId}/teams`, {
-      method: 'POST',
-      body: teamBracketToDTO(team, tournamentId),
-    })
-      .then((team) => teamBracketToDomain(team.data))
+    $fetch<ApiResponse<TeamBracket>>(
+      `/api/v1/tournaments/${tournamentId}/teams`,
+      {
+        method: 'POST',
+        body: teamBracketToDTO(team, tournamentId),
+      },
+    )
+      .then((team) => teamBracketToDomain(team.data, tournamentId))
       .catch((error: unknown) => {
         throw new ApiError(
           getMessageError(error, "Erreur lors de la création de l'équipe"),
@@ -413,18 +422,15 @@ export default class BracketService extends AbstractService {
         )
       })
       .then((team) =>
-        image?.name ? this.postImageTeam(tournamentId, team.id!, image) : team,
+        image?.name ? this.postImageTeam(tournamentId, team, image) : team,
       )
 
-  override putTeam = (
-    { image, ...team }: Team,
-    tournamentId: number,
-  ): Promise<Team> =>
+  override putTeam = ({ image, ...team }: Team): Promise<Team> =>
     $fetch<ApiResponse<TeamBracket>>(
-      `/api/tournaments/${tournamentId}/teams/${team.id}`,
+      `/api/v1/tournaments/${team.tournament_id}/teams/${team.id}`,
       {
         method: 'PUT',
-        body: teamBracketToDTO(team, tournamentId),
+        body: teamBracketToDTO(team, team.tournament_id!),
       },
     )
       .catch((error: unknown) => {
@@ -432,13 +438,17 @@ export default class BracketService extends AbstractService {
           getMessageError(error, "Erreur lors de la modification de l'équipe"),
         )
       })
-      .then((team) => teamBracketToDomain(team.data))
+      .then((teamResponse) =>
+        teamBracketToDomain(teamResponse.data, team.tournament_id!),
+      )
       .then((team) =>
-        image?.name ? this.postImageTeam(tournamentId, team.id!, image) : team,
+        image?.name
+          ? this.postImageTeam(team.tournament_id!, team, image)
+          : team,
       )
 
   override deleteTeam = (tournamentId: number, teamId: number): Promise<void> =>
-    $fetch<void>(`/api/tournaments/${tournamentId}/teams/${teamId}`, {
+    $fetch<void>(`/api/v1/tournaments/${tournamentId}/teams/${teamId}`, {
       method: 'DELETE',
     }).catch((error: unknown) => {
       throw new ApiError(
@@ -448,11 +458,11 @@ export default class BracketService extends AbstractService {
 
   postImageTeam = (
     tournamentId: number,
-    teamId: number,
+    team: Team,
     image: File,
   ): Promise<Team> =>
     $fetch<ApiResponse<TeamBracket>>(
-      `/api/tournaments/${tournamentId}/teams/${teamId}/logo`,
+      `/api/v1/tournaments/${tournamentId}/teams/${team.id}/logo`,
       {
         method: 'POST',
         body: this.formImage(image),
@@ -466,10 +476,38 @@ export default class BracketService extends AbstractService {
           ),
         )
       })
-      .then((teamReponse) => teamBracketToDomain(teamReponse.data))
+      .then((teamReponse) =>
+        teamBracketToDomain(teamReponse.data, tournamentId),
+      )
       .catch((error: unknown) => {
         throw new ApiError(
           getMessageError(error, "Erreur lors de la récupération de l'équipe"),
+        )
+      })
+      .then((team: Team) =>
+        this.getAllTeams()
+          .then((teams: Team[]) =>
+            teams.filter(
+              (teamInTable: Team) =>
+                cleanTeamName(teamInTable.name) === cleanTeamName(team.name),
+            ),
+          )
+          .then((teams: Team[]) =>
+            teams.map((teamInTable: Team) =>
+              this.putTeam({
+                ...teamInTable,
+                logo_path: team.logo_path,
+              }),
+            ),
+          )
+          .then(() => team),
+      )
+      .catch((error: unknown) => {
+        throw new ApiError(
+          getMessageError(
+            error,
+            "Erreur lors de la modification des images de l'équipe dans tous les tournois",
+          ),
         )
       })
 
@@ -518,7 +556,7 @@ export default class BracketService extends AbstractService {
     teamId: number | null,
   ): Promise<void> =>
     $fetch<void>(
-      `/api/tournaments/${tournamentId}/stage_items/${stageItemId}/inputs/${inputId}`,
+      `/api/v1/tournaments/${tournamentId}/stage_items/${stageItemId}/inputs/${inputId}`,
       {
         method: 'PUT',
         body: {
@@ -543,7 +581,7 @@ export default class BracketService extends AbstractService {
   }
 
   override login = (user: User): Promise<Token> =>
-    $fetch<TokenResponseBracket>('/api/token', {
+    $fetch<TokenResponseBracket>('/api/v1/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
@@ -580,7 +618,7 @@ export default class BracketService extends AbstractService {
     tournamentId: number,
     newStatus: Status,
   ): Promise<void> =>
-    $fetch<void>(`/api/tournaments/${tournamentId}/change-status`, {
+    $fetch<void>(`/api/v1/tournaments/${tournamentId}/change-status`, {
       method: 'POST',
       body: {
         status: newStatus === 'En cours' ? 'OPEN' : 'ARCHIVED',
@@ -602,10 +640,13 @@ export default class BracketService extends AbstractService {
         return court
       })
       .then((court) =>
-        $fetch<void>(`/api/tournaments/${tournamentId}/matches/${match.id}`, {
-          method: 'PUT',
-          body: MatchToDTO(match, court.id),
-        }),
+        $fetch<void>(
+          `/api/v1/tournaments/${tournamentId}/matches/${match.id}`,
+          {
+            method: 'PUT',
+            body: MatchToDTO(match, court.id),
+          },
+        ),
       )
       .catch((error: unknown) => {
         throw new ApiError(

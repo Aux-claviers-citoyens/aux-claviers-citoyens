@@ -4,6 +4,7 @@ import type {
 } from '~/types/bracket/MatchWithDetails'
 import type { Match } from '~/types/front/Match'
 import { getFinalInput } from '~/types/bracket/StageItemInput'
+import { stageItemInputFinalToDomain } from '~/mappers/bracket/teamMapperBracket'
 
 export function MatchToDTO(match: Match, courtId: number): MatchBracketPut {
   return <MatchBracketPut>{
@@ -24,10 +25,16 @@ export function MatchBracketToDomain(match: MatchWithDetails): Match {
     id: match.id,
     round_id: match.round_id,
     team_one: input1
-      ? { ...input1.team, score: match.stage_item_input1_score }
+      ? {
+          ...stageItemInputFinalToDomain(input1),
+          score: match.stage_item_input1_score,
+        }
       : undefined,
     team_two: input2
-      ? { ...input2.team, score: match.stage_item_input2_score }
+      ? {
+          ...stageItemInputFinalToDomain(input2),
+          score: match.stage_item_input2_score,
+        }
       : undefined,
   }
 }

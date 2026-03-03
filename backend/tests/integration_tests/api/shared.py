@@ -32,10 +32,18 @@ def find_free_port() -> int:
 
 TEST_HOST: Final[str] = "127.0.0.1"
 TEST_PORT: Final[int] = find_free_port()
+API_PREFIX: Final[str] = "/api/v1"
 
 
 def get_root_uvicorn_url() -> str:
-    return f"http://{TEST_HOST}:{TEST_PORT}/"
+    return f"http://{TEST_HOST}:{TEST_PORT}"
+
+
+def build_url(endpoint: str) -> str:
+    normalized = endpoint.lstrip("/")
+    if normalized:
+        return f"{get_root_uvicorn_url()}{API_PREFIX}/{normalized}"
+    return f"{get_root_uvicorn_url()}{API_PREFIX}/"
 
 
 class UvicornTestServer(uvicorn.Server):
@@ -77,7 +85,7 @@ async def send_request(
     async with aiohttp.ClientSession() as session:
         async with session.request(
             method=method.value,
-            url=get_root_uvicorn_url() + endpoint,
+            url=build_url(endpoint),
             data=body,
             json=json,
             headers=headers,
@@ -90,7 +98,7 @@ async def send_request_raw(method: HTTPMethod, endpoint: str) -> str:
     async with aiohttp.ClientSession() as session:
         async with session.request(
             method=method.value,
-            url=get_root_uvicorn_url() + endpoint,
+            url=build_url(endpoint),
         ) as resp:
             return await resp.text()
 

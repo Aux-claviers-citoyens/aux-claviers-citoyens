@@ -2,7 +2,6 @@
   import type { TableColumn } from '@nuxt/ui'
   import type { Tournament } from '~/types/front/Tournament'
   import type { TeamWithScore } from '~/types/front/Match'
-  import { getPaginationRowModel } from '@tanstack/table-core'
 
   const UAvatar = resolveComponent('UAvatar')
   const UIcon = resolveComponent('UIcon')
@@ -32,7 +31,7 @@
       cell: ({ row }) => {
         return row.original.logo_path !== null
           ? h(UAvatar, {
-              src: `/api/static/team-logos/${row.original.logo_path}`,
+              src: row.original.logo_path,
               class: 'w-[60px] h-[60px]',
             })
           : h(UIcon, {
@@ -74,7 +73,7 @@
   <UTable
     :data="filtered"
     :columns="columns"
-    class="flex-1 bg-black"
+    class="flex-1"
     v-model:pagination="pagination"
     :pagination-options="{
       getPaginationRowModel: getPaginationRowModel(),

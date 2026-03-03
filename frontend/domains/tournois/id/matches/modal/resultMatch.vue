@@ -20,13 +20,18 @@
     class="text-center"
   >
     <span>Résultat</span>
-    <div class="flex justify-evenly bg-gray-600 rounded-2xl p-4 mt-3">
-      <div class="flex flex-col items-center gap-1">
-        <LogoTeam :team="match.team_one" />
+    <div
+      class="grid grid-cols-3 bg-gray-600 rounded-2xl py-4 mt-3 text-lg sm:text-xl md:text-2xl"
+    >
+      <div class="flex flex-col items-center gap-1 m-auto">
+        <LogoTeam
+          :team="match.team_one"
+          class="h-10 w-10 sm:h-20 sm:w-20"
+        />
         <span>{{ match.team_one!.name }}</span>
       </div>
-      <div class="flex justify-between gap-10">
-        <span class="flex-1 my-auto">{{
+      <div class="grid grid-cols-[1fr_4fr_1fr]">
+        <span class="my-auto">{{
           !match?.team_one
             ? '-'
             : scoreDiff(match) == 0 && match?.team_one?.score == 0
@@ -35,10 +40,10 @@
         }}</span>
         <img
           alt="Versus"
-          class="flex-1 h-20 w-20 my-auto"
+          class="h-10 w-10 sm:h-20 sm:w-20 m-auto"
           src="/versus.svg"
         />
-        <span class="flex-1 my-auto">{{
+        <span class="my-auto">{{
           !match?.team_two
             ? '-'
             : scoreDiff(match) == 0 && match?.team_two?.score == 0
@@ -46,8 +51,11 @@
               : match?.team_two?.score || '0'
         }}</span>
       </div>
-      <div class="flex flex-col items-center gap-1">
-        <LogoTeam :team="match.team_two" />
+      <div class="flex flex-col items-center gap-1 m-auto">
+        <LogoTeam
+          :team="match.team_two"
+          class="h-10 w-10 sm:h-20 sm:w-20"
+        />
         <span>{{ match.team_two!.name }}</span>
       </div>
     </div>

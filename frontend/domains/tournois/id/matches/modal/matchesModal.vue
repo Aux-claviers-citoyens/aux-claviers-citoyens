@@ -57,14 +57,16 @@
     :open="!!match"
     v-if="matchModif"
     :ui="{
-      content: 'max-w-none',
+      content:
+        'max-w-[1200px] w-[96vw] sm:w-[92vw] h-auto max-h-[calc(100dvh-2rem)] overflow-hidden',
     }"
-    class="w-9/15 text-xl"
+    class="text-xl"
   >
     <template #content>
       <TournamentComponent
         :loadTournament="loadTournament"
         :tournament="tournament"
+        class="overflow-y-auto"
       >
         <div class="m-4 flex flex-col gap-3">
           <ResultMatch :match="matchModif" />

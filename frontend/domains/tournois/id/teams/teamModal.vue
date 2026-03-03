@@ -39,7 +39,7 @@
   <UModal
     v-model:open="isOpenModal"
     :ui="{
-      content: `max-w-none w-[1320px] h-[3${team.id ? '10' : '80'}px] overflow-y-auto`,
+      content: `max-w-[1320px] w-[96vw] sm:w-[92vw] h-auto max-h-[90vh] overflow-y-auto`,
     }"
     :title="title"
     aria-describedby="Modal de Team"
@@ -62,6 +62,7 @@
             v-model:form="form"
             v-model:isValid="isValid"
             v-model:isLoading="isLoading"
+            v-model:isOpenModal="isOpenModal"
             :tournamentId="tournamentId"
             :refresh="refresh"
             :team="team"

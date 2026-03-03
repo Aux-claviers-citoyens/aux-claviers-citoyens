@@ -31,7 +31,7 @@ describe('teamBracketToDomain', () => {
       id: 10,
       name: 'Red Team',
       score: 1450,
-      logo_path: logoPath,
+      logo_path: `/static/team-logos/${logoPath}`,
     }
 
     expect(logoPath).toMatch(uuidImageRegex)
@@ -42,10 +42,12 @@ describe('teamBracketToDomain', () => {
       id: 10,
       name: 'Red Team',
       elo_score: 1450,
-      logo_path: logoPath,
+      logo_path: `/static/team-logos/${logoPath}`,
     })
-    expect(result.logo_path).toBe(logoPath)
-    expect(result.logo_path).toMatch(uuidImageRegex)
+    expect(result.logo_path).toBe(`/static/team-logos/${logoPath}`)
+    expect(result.logo_path?.replace('/static/team-logos/', '')).toMatch(
+      uuidImageRegex,
+    )
   })
 
   it('returns an empty object when input is falsy', () => {
@@ -61,14 +63,14 @@ describe('stageItemInputFinalToDomain', () => {
       team: {
         id: 6,
         name: 'Omega',
-        logo_path: logoPath,
+        logo_path: `/static/team-logos/${logoPath}`,
       },
     }
 
     expect(stageItemInputFinalToDomain(input as never)).toEqual({
       id: 6,
       name: 'Omega',
-      logo_path: logoPath,
+      logo_path: `/static/team-logos/${logoPath}`,
       elo_score: 15,
     })
   })

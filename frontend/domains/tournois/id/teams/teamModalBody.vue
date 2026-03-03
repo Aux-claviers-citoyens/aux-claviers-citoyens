@@ -15,6 +15,7 @@
   const form = defineModel<HTMLFormElement>('form')
   const isValid = defineModel<boolean>('isValid')
   const isLoading = defineModel<boolean>('isLoading')
+  const isOpenModal = defineModel<boolean>('isOpenModal')
 </script>
 
 <template>
@@ -23,6 +24,7 @@
     v-model:form="form"
     v-model:isValid="isValid"
     v-model:isLoading="isLoading"
+    v-model:isOpenModal="isOpenModal"
     :tournamentId="tournamentId"
     :refresh="refresh"
     :team="team"

@@ -61,11 +61,7 @@
   >
     <template #header>
       <img
-        :src="
-          tournament?.logo_path
-            ? `/api/static/tournament-logos/${tournament?.logo_path}`
-            : `/bg-tournois-default.jpg`
-        "
+        :src="tournament?.logo_path ?? '/bg-tournois-default.jpg'"
         alt="Tournois"
         class="w-full h-48 object-cover object-top"
       />

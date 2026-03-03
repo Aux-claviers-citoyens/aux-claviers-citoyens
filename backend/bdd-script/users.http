@@ -1,0 +1,56 @@
+@scheme = http://
+@host = localhost
+@port = 8400
+@prefix = /api/v1
+@baseUrl = {{scheme}}{{host}}:{{port}}{{prefix}}
+@endpoint = users
+
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiYWRtaW5AZXhhbXBsZS5jb20iLCJleHAiOjE3NzI1NDI4MTF9.5mAwd-hh7NOBpR8OomxL9BllaUPIsImvhwPGdtoVrYU
+
+@id = 1
+
+### Me
+GET {{baseUrl}}/{{endpoint}}/me
+Content-Type: application/json
+accept: application/json
+authorization: Bearer {{token}}
+
+### GetById
+GET {{baseUrl}}/{{endpoint}}/{{id}}
+Content-Type: application/json
+accept: application/json
+authorization: Bearer {{token}}
+
+### Put
+PUT {{baseUrl}}/{{endpoint}}/{{id}}
+Content-Type: application/json
+accept: application/json
+authorization: Bearer {{token}}
+
+{
+  "email": "admin@example.org",
+  "name": "admin"
+}
+
+### Password
+PUT {{baseUrl}}/{{endpoint}}/{{id}}/password
+Content-Type: application/json
+accept: application/json
+authorization: Bearer {{token}}
+
+{
+    "password": "adminadmin"
+}
+
+### Post
+POST {{baseUrl}}/{{endpoint}}/register
+Content-Type: application/json
+accept: application/json
+authorization: Bearer {{token}}
+
+{
+  "email": "admin2@example.org",
+  "name": "admin",
+  "password": "adminadmin",
+  "captcha_token": "captcha-token"
+}

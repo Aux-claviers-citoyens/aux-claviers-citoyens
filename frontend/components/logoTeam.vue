@@ -23,7 +23,7 @@
     <img
       v-else-if="team?.logo_path"
       alt="Logo équipe"
-      :src="`/api/static/team-logos/${team?.logo_path}`"
+      :src="team?.logo_path"
       :style="style"
     />
     <UIcon

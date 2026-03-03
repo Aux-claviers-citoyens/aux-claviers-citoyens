@@ -1,0 +1,7 @@
+#token
+POST http://localhost:8400/api/v1/token
+Content-Type: application/x-www-form-urlencoded
+Accept: application/json
+
+grant_type=password&username=admin@example.com&password=adminadmin
+

@@ -1,6 +1,7 @@
 import type { Team } from '~/types/front/Team'
 
-const cleanTeamName = (name: string) => name.replace(/[ _-]/g, '').toUpperCase()
+export const cleanTeamName = (name: string) =>
+  name.replace(/[ _-]/g, '').toUpperCase()
 
 export const filterTeam = (teams: Team[]) =>
   teams

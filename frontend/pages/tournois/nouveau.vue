@@ -4,7 +4,7 @@
   import { getMessageError } from '~/methods/getMessageError'
   import { toastError, toastSuccess } from '~/methods/toasts'
   import ValidationFooter from '~/components/validationFooter.vue'
-  import { z } from 'zod'
+  import * as zod from 'zod'
 
   definePageMeta({ middleware: ['auth'] })
 
@@ -19,12 +19,13 @@
 
   const isLoading = ref(false)
 
-  const schema = z.object({
-    name: z
+  const schema = zod.object({
+    name: zod
       .string()
+      .trim()
       .min(2, 'Le nom doit faire au moins 2 caractères')
       .max(30, 'Le nom est trop long'),
-    game: z.enum(
+    game: zod.enum(
       [Games.Fortnite, Games.LeagueOfLegends, Games.RocketLeague],
       'Un jeu doit être choisi',
     ),
@@ -36,6 +37,7 @@
     isLoading.value = true
 
     try {
+      tournament.value.name = tournament.value.name.trim().replace(/\s+/g, ' ')
       await backend.postTournament(tournament.value)
       await navigateTo('/tournois')
       toastSuccess('Tournoi créé avec succès!')
